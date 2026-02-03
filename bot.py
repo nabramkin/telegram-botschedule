@@ -1,9 +1,12 @@
 import telebot
 import json
 import os
+from datetime import datetime, timedelta  # ← НОВОЕ!
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from flask import Flask
 import threading
+
+
 
 TOKEN = os.getenv('TOKEN')  # Токен из переменных Render
 bot = telebot.TeleBot(TOKEN)
@@ -62,13 +65,25 @@ schedule = {
 print("✅ Расписание загружено успешно!")
 
 # Клавиатура с днями
+from datetime import datetime  # ← ДОБАВЬ в импорты в самом верху
+
+# Клавиатура с реальными датами (ЗАМЕНИ старую функцию)
 def get_days_keyboard():
+    today = datetime.now()
+    days = []
+    
+    for i in range(7):  # Сегодня + 6 дней вперед
+        current_day = today + timedelta(days=i)
+        day_name = current_day.strftime("%A").lower()  # понедельник, вторник...
+        date_str = current_day.strftime("%d.%m")  # 03.02
+        
+        # Добавляем кнопку с датой
+        days.append(KeyboardButton(f"📅 {date_str} ({day_name.capitalize()})"))
+    
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
-    markup.add(KeyboardButton('📅 Понедельник'), KeyboardButton('📅 Вторник'))
-    markup.add(KeyboardButton('📅 Среда'), KeyboardButton('📅 Четверг'))
-    markup.add(KeyboardButton('📅 Пятница'), KeyboardButton('📅 Суббота'))
-    markup.add(KeyboardButton('📅 Воскресенье'))
+    markup.add(*days)  # Распаковываем список кнопок
     return markup
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
