@@ -5,10 +5,10 @@ from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from flask import Flask
 import threading
 
-TOKEN = os.getenv('TOKEN')  # Токен из переменных Render
+TOKEN = os.getenv('TOKEN')
 bot = telebot.TeleBot(TOKEN)
 
-# Словарь для обработки сокращений
+# ✅ ИСПРАВЛЕННЫЙ словарь сокращений
 days_map = {
     'понедельник': 'понедельник', 'пн': 'понедельник', '1': 'понедельник',
     'вторник': 'вторник', 'вт': 'вторник', '2': 'вторник',
@@ -19,9 +19,12 @@ days_map = {
     'воскресенье': 'воскресенье', 'вс': 'воскресенье', '7': 'воскресенье'
 }
 
-# Загрузка расписания
-with open('schedule.json', 'r', encoding='utf-8') as f:
-    schedule = json.load(f)
+# Безопасная загрузка расписания
+try:
+    with open('schedule.json', 'r', encoding='utf-8') as f:
+        schedule = json.load(f)
+except:
+    schedule = {}  # Если файла нет
 
 # Клавиатура с днями
 def get_days_keyboard():
@@ -60,7 +63,7 @@ def handle_day(message):
     
     bot.reply_to(message, text, parse_mode='HTML', reply_markup=get_days_keyboard())
 
-# 🔥 НОВОЕ: Веб-сервер для Render (РЕШЕНИЕ ошибки порта)
+# Веб-сервер для Render
 app = Flask(__name__)
 
 @app.route("/")
@@ -72,7 +75,6 @@ def run_flask():
     app.run(host="0.0.0.0", port=port)
 
 if __name__ == "__main__":
-    # Запускаем Flask в отдельном потоке
     flask_thread = threading.Thread(target=run_flask)
     flask_thread.daemon = True
     flask_thread.start()
