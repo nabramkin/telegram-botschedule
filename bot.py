@@ -1,28 +1,7 @@
-{\rtf1\ansi\ansicpg1251\cocoartf2759
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-
-\f0\fs24 \cf0 import telebot\
 import telebot
 import json
 import os
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
-import requests
-import time
-import threading
-
-def keep_alive():
-    while True:
-        try:
-            requests.get("https://telegram-bot-schedule-iq4k.onrender.com", timeout=10)
-        except:
-            pass
-        time.sleep(600)  # 10 мин
-
-threading.Thread(target=keep_alive, daemon=True).start()
 
 TOKEN = os.getenv('TOKEN')  # Токен из переменных Render
 bot = telebot.TeleBot(TOKEN)
@@ -54,7 +33,7 @@ def get_days_keyboard():
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.reply_to(message, 
-        "🔔 Привет! Я бот с расписанием уроков Тимоши.\n»
+        "🔔 Привет! Я бот с расписанием уроков.\n"
         "Напиши день недели или выбери кнопку ниже:",
         reply_markup=get_days_keyboard())
 
@@ -81,5 +60,3 @@ def handle_day(message):
 
 print("Бот запущен!")
 bot.infinity_polling()
-
-}
