@@ -2,6 +2,8 @@ import telebot
 import json
 import os
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+from flask import Flask
+import threading
 
 TOKEN = os.getenv('TOKEN')  # Токен из переменных Render
 bot = telebot.TeleBot(TOKEN)
@@ -33,7 +35,7 @@ def get_days_keyboard():
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.reply_to(message, 
-        "🔔 Привет! Я бот с расписанием уроков.\n"
+        "🔔 Привет! Я бот с расписанием уроков Тимоши.\n"
         "Напиши день недели или выбери кнопку ниже:",
         reply_markup=get_days_keyboard())
 
@@ -58,5 +60,22 @@ def handle_day(message):
     
     bot.reply_to(message, text, parse_mode='HTML', reply_markup=get_days_keyboard())
 
-print("Бот запущен!")
-bot.infinity_polling()
+# 🔥 НОВОЕ: Веб-сервер для Render (РЕШЕНИЕ ошибки порта)
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    return "🔔 Telegram бот с расписанием уроков Тимоши работает!"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
+if __name__ == "__main__":
+    # Запускаем Flask в отдельном потоке
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.daemon = True
+    flask_thread.start()
+    
+    print("Бот запущен!")
+    bot.infinity_polling()
