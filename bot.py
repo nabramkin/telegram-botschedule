@@ -64,25 +64,31 @@ schedule = {
 }
 print("✅ Расписание загружено успешно!")
 
-# Клавиатура с днями
-from datetime import datetime  # ← ДОБАВЬ в импорты в самом верху
 
-# Клавиатура с реальными датами (ЗАМЕНИ старую функцию)
+# Даты рядом с кнопкаами
+from datetime import datetime, timedelta  # ← Импорты уже есть
+
+# ✅ Кнопки с РЕАЛЬНЫМИ ДАТАМИ на РУССКОМ
 def get_days_keyboard():
     today = datetime.now()
-    days = []
+    russian_days = [
+        "Понедельник", "Вторник", "Среда", "Четверг", 
+        "Пятница", "Суббота", "Воскресенье"
+    ]
+    
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
     
     for i in range(7):  # Сегодня + 6 дней вперед
         current_day = today + timedelta(days=i)
-        day_name = current_day.strftime("%A").lower()  # понедельник, вторник...
+        day_index = current_day.weekday()  # 0=понедельник, 6=воскресенье
+        day_name = russian_days[day_index]
         date_str = current_day.strftime("%d.%m")  # 03.02
         
-        # Добавляем кнопку с датой
-        days.append(KeyboardButton(f"📅 {date_str} ({day_name.capitalize()})"))
+        button_text = f"📅 {date_str} ({day_name})"
+        markup.add(KeyboardButton(button_text))
     
-    markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
-    markup.add(*days)  # Распаковываем список кнопок
     return markup
+
 
 
 @bot.message_handler(commands=['start'])
